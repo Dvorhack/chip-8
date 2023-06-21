@@ -21,3 +21,35 @@ pub struct CPU {
     sound_timer: u8,
     input: [bool; 16]
 }
+
+impl CPU {
+    pub fn new() -> Self {
+        let mut ram = [0u8; CPU_RAM];
+        // for i in 0..FONT_SET.len() {
+        //     ram[i] = FONT_SET[i];
+        // }
+
+        CPU {
+            vmem: [[0; CHIP8_WIDTH]; CHIP8_HEIGHT],
+            ram: ram,
+            stack: [0; CPU_STACK],
+
+            regs: [0; 16],
+            i: 0,
+            pc: 0x200,
+            sp: 0,
+
+            delay_timer: 0,
+            sound_timer: 0,
+            input: [false; 16],
+        }
+    }
+
+    pub fn tick(&mut self, keys: [bool; 16]) -> bool{
+        self.input = keys;
+        self.pc += 1;
+
+        true
+
+    }
+}

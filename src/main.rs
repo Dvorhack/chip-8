@@ -9,7 +9,7 @@ use std::thread;
 
 use cpu::CPU;
 
-fn setupGraphics(sdl_context: sdl2::Sdl) {
+fn setupGraphics(sdl_context: &sdl2::Sdl) {
     let video_subsystem = sdl_context.video().unwrap();
 
     let window = video_subsystem.window("rust-sdl2 demo", 800, 600)
@@ -24,7 +24,7 @@ fn setupGraphics(sdl_context: sdl2::Sdl) {
     canvas.present();
 }
 
-fn getKeypad(sdl_context: sdl2::Sdl){
+fn getKeypad(sdl_context: &sdl2::Sdl) -> Result<[bool; 16], ()>{
 
     let mut event_pump = sdl_context.event_pump().unwrap();
 
@@ -37,29 +37,31 @@ fn getKeypad(sdl_context: sdl2::Sdl){
             _ => {}
         }
     }
+    Ok([true; 16])
 }
 
 pub fn main() {
     let sleep_duration = Duration::from_millis(2);
 
     let sdl_context = sdl2::init().unwrap();
+    setupGraphics(&sdl_context);
 
-    let cpu = CPU::new();
+    let mut cpu = CPU::new();
     
     
-    while let Ok(keypad) = getKeypad(sdl_context) {
+    while let Ok(keys) = getKeypad(&sdl_context) {
 
-        let output = cpu.tick(keypad);
+        let output = cpu.tick(keys);
 
-        if output.vram_changed {
+        if output {
             // display_driver.draw(output.vram);
         }
 
-        if output.beep {
-            // audio_driver.start_beep();
-        } else {
-            // audio_driver.stop_beep();
-        }
+        // if output.beep {
+        //     // audio_driver.start_beep();
+        // } else {
+        //     // audio_driver.stop_beep();
+        // }
 
         thread::sleep(sleep_duration);
     }
